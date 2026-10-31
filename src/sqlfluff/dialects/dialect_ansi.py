@@ -1547,6 +1547,7 @@ class FunctionNameSegment(BaseSegment):
         OneOf(
             Ref("FunctionNameIdentifierSegment"),
             Ref("QuotedIdentifierSegment"),
+            Ref("NakedIdentifierSegment"),
             terminators=[Ref("BracketedSegment")],
         ),
         allow_gaps=False,
@@ -1987,8 +1988,7 @@ class JoinClauseSegment(BaseSegment):
             Indent,
             Ref("JoinTargetGrammar"),
             AnyNumberOf(Ref("NestedJoinGrammar")),
-            # indented_using_on_newline keeps this indent open over ON/USING
-            Conditional(Dedent, indented_using_on_newline=False),
+            Dedent,
             Sequence(
                 # Using nested sequence here so we only get the indents
                 # if we also have content.
@@ -2006,7 +2006,6 @@ class JoinClauseSegment(BaseSegment):
                 Conditional(Dedent, indented_using_on=True),
                 optional=True,
             ),
-            Conditional(Dedent, indented_using_on_newline=True),
         ),
         # Note NATURAL joins do not support Join conditions
         Sequence(
